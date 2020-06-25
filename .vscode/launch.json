@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell: Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}",
+            "args": [
+                "-URI",
+                "https://www.lenovo.com/us/en/laptops/thinkpad/thinkpad-x1/X1-Carbon-Gen-7/p/22TP2TXX17G",
+                "-Models",
+                "@(\"20R1S0M100\", \"20R10011US\")",
+                "-MonitorFrequency",
+                "00:00:05"
+            ]
+        }
+    ]
+}

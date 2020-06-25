@@ -10,8 +10,8 @@ store along with the stock status.
 ### Run Example
 ```powershell
 $URI = "https://www.lenovo.com/us/en/laptops/thinkpad/thinkpad-x1/X1-Carbon-Gen-7/p/22TP2TXX17G"
-Get-LenovoLaptopStockStatus.ps1 -URI $URI -Model "20R10015US" -MonitorFrequency "00:05:00"
+Get-LenovoLaptopStockStatus.ps1 -URI $URI -Models @("20R1S04100", "20R10015US") -MonitorFrequency "00:05:00"
 ```
-This example checks the status of the X1 Carbon Gen 7 model number 20R10015US. The script will execute continuously 
+This example checks the status of the X1 Carbon Gen 7 model numbers 20R1S04100 and 20R10015US. The script will execute continuously 
 every 5 minutes until stopped, even after finding that the device is in stock. The notifications will expire 
 automatically before the next run.

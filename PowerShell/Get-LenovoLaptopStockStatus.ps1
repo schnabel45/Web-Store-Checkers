@@ -5,8 +5,8 @@ param(
     $URI,
     # Model Number
     [Parameter(Mandatory=$true)]
-    [string]
-    $Model,
+    [string[]]
+    $Models,
     # MonitorFrequency
     [timespan]
     $MonitorFrequency = $(New-TimeSpan)
@@ -20,12 +20,12 @@ param(
 .DESCRIPTION
     Used to snipe good deals from Lenovo's website.
 .EXAMPLE
-    PS C:\> Get-LenovoLaptopStockStatus.ps1 -URI $URI -Model "20R10015US"
+    PS C:\> Get-LenovoLaptopStockStatus.ps1 -URI $URI -Models @("20R10015US")
     Check the specified URI to see if model 20R10015US is in stock
 .INPUTS
     URI: URI of the model's webpage, for example:
         https://www.lenovo.com/us/en/laptops/thinkpad/thinkpad-x1/X1-Carbon-Gen-7/p/22TP2TXX17G
-    Model: Model Identifier you want to track. For example 20R10015US
+    Models: Sring array of model identifiers you want to track. For example 20R10015US
     MonitorFrequency: Timespan for how long between recurring checks.
 .OUTPUTS
     Windows 10 Notification with Alarm Sound every $MonitorFrequency when the model is in stock.
@@ -71,21 +71,25 @@ do {
     Write-Output $(Get-Date)
     $webStock = Get-CurrentStock -uri $uri
 
-    if($webStock.PartNumber -icontains $Model){
-        $preferredModel = $webStock | Where-Object{$_.PartNumber -ieq $Model}
-        if($preferredModel.InStock){
-            $notificationExpiration = New-TimeSpan -Minutes 5
-            if($MonitorFrequency -gt 0){
-                $notificationExpiration = $MonitorFrequency
+    foreach($Model in $Models){
+        if($webStock.PartNumber -icontains $Model){
+            $preferredModel = $webStock | Where-Object{$_.PartNumber -ieq $Model}
+            if($preferredModel.InStock){
+                $notificationExpiration = New-TimeSpan -Minutes 5
+                if($MonitorFrequency -gt 0){
+                    $notificationExpiration = $MonitorFrequency
+                }
+                $price = $preferredModel.Price
+                New-BurntToastNotification -Text "$Model is now in stock on Lenovo's website for $price." `
+                    -Sound 'Alarm' `
+                    -ExpirationTime $(Get-Date).Add($notificationExpiration)
+            } else {
+                $webStock | Format-Table
             }
-            New-BurntToastNotification -Text "$Model is now in stock on Lenovo's website." `
-                -Sound 'Alarm' `
-                -ExpirationTime $(Get-Date).Add($notificationExpiration)
         } else {
-            $webStock | Format-Table
+            Write-Output "Lenovo no longer has model $Model"
         }
-    } else {
-        Write-Output "Lenovo no longer has model $Model"
     }
+
     Start-Sleep -Seconds $MonitorFrequency.TotalSeconds
 } while($MonitorFrequency -ne 0)
